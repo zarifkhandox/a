@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Flip Game</title>
+</head>
+<body>
+    <h1>Welcome to the Coin Flip Game</h1>
+    <form id="coinflip-form">
+        <label for="bet">Enter your bet:</label>
+        <input type="number" id="bet" name="bet" required>
+        <button type="submit">Play</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('coinflip-form');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bet = document.getElementById('bet').value;
+
+            try {
+                const response = await fetch('/play', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bet: parseInt(bet) })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p>You bet: ${bet}</p>
+                        <p>Your choice: ${data.user_choice}</p>
+                        <p>Flip result: ${data.flip_result}</p>
+                        <p>${data.won ? "You won!" : "You lost!"}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p>Something went wrong!</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
